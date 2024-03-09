@@ -58,6 +58,21 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
+app.get("/greet", (req, res) => {
+  res.send("hello");
+});
+
+app.get("/connect", (req, res) => {
+  pool.getConnection((err, db) => {
+    if (err) {
+      console.error("Error getting database connection: " + err.message);
+      return res.status(500).json({ msg: "Internal server error" });
+    }
+
+    req.send("connected");
+  });
+});
+
 const codeVerifications = {};
 const userInfo = {
   fname: "",
@@ -765,13 +780,12 @@ app.delete("/userDelete/:id", (req, res) => {
             return res.json({ msg: "success" });
           });
         } else if (result1[0].role === "Student") {
-
           const sql4 = "DELETE FROM tb_joinclass WHERE user_id = ?";
 
           db.query(sql4, [id], (err4, result4) => {
             if (err4) {
               db.release();
-              return res.json({msg: "delete error"});
+              return res.json({ msg: "delete error" });
             }
           });
 
