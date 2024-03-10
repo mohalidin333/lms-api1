@@ -365,11 +365,10 @@ app.post("/logout", (req, res) => {
   if (accessToken) {
     res.clearCookie("accessToken");
     res.json({msg: "success"});
-
   } else {
-    return res.json({msg: "No token found!"});
+    return res.json({msg: `No token found: ${accessToken}`});
   }
-  
+
   // const userId = req.user.id;
   // pool.getConnection((err, db) => {
   //   if (err) {
