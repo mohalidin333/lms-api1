@@ -58,21 +58,6 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-app.get("/greet", (req, res) => {
-  res.send("hello");
-});
-
-app.get("/connect", (req, res) => {
-  pool.getConnection((err, db) => {
-    if (err) {
-      console.error("Error getting database connection: " + err.message);
-      return res.status(500).json({ msg: "Internal server error" });
-    }
-
-    res.send("connected");
-  });
-});
-
 const codeVerifications = {};
 const userInfo = {
   fname: "",
@@ -298,7 +283,6 @@ app.post("/login", (req, res) => {
         res.cookie("accessToken", token, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production" ? true : false,
-          sameSite: "strict",
         });
 
         const sql1 =
