@@ -354,8 +354,8 @@ app.get("/userName", verifyTokenMiddleware, (req, res) => {
 });
 
 // logout
-app.post("/logout", (req, res) => {
-  // res.clearCookie("accessToken");
+app.post("/logout", verifyTokenMiddleware, (req, res) => {
+  res.clearCookie("accessToken");
   const userId = req.user.id;
 
   pool.getConnection((err, db) => {
