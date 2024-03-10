@@ -283,6 +283,7 @@ app.post("/login", (req, res) => {
         res.cookie("accessToken", token, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production" ? true : false,
+          sameSite: "none",
         });
 
         const sql1 =
