@@ -355,11 +355,9 @@ app.get("/userName", verifyTokenMiddleware, (req, res) => {
 
 // logout
 app.post("/logout", (req, res) => {
-  res.clearCookie("accessToken", {domain: "http://localhost:8081"});
-  res.json({msg: "success"});
-
+  res.clearCookie("accessToken");
   const userId = req.user.id;
-  
+
   pool.getConnection((err, db) => {
     if (err) {
       console.error("Error getting database connection: " + err.message);
