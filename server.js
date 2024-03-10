@@ -34,9 +34,11 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.static("public/avatars"));
 
+app.set("trust proxy", 1);
+
 // verify Token Middleware
 const verifyTokenMiddleware = (req, res, next) => {
-  const token = req.cookies.token;
+  const token = req.cookies.accessToken;
 
   jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
     if (err) {
@@ -280,7 +282,7 @@ app.post("/login", (req, res) => {
         const token = jwt.sign({ id, role }, secretKey, {
           expiresIn: "1d",
         });
-        res.cookie("token", token, {
+        res.cookie("accessToken", token, {
           httpOnly: false,
           secure: true,
           sameSite: "none",
@@ -313,7 +315,7 @@ app.post("/login", (req, res) => {
 
 // user auth
 app.get("/isAuth", (req, res) => {
-  const token = req.cookies.token;
+  const token = req.cookies.accessToken;
 
   if (!token) {
     return res.json({ msg: "no token" });
@@ -323,7 +325,7 @@ app.get("/isAuth", (req, res) => {
     if (err) {
       return res.status(401).json({ msg: "Invalid token" });
     }
-    return res.json({ isAuth: true, role: user.role, myToken: token });
+    return res.json({ isAuth: true, role: user.role });
   });
 });
 
@@ -355,9 +357,8 @@ app.get("/userName", verifyTokenMiddleware, (req, res) => {
 
 // logout
 app.post("/logout", (req, res) => {
-  res.clearCookie("token", {domain: "http://localhost:8081"});
+  res.clearCookie("accessToken", {domain: "http://localhost:8081"});
   res.json({msg: "success"});
-
   // const userId = req.user.id;
   // pool.getConnection((err, db) => {
   //   if (err) {
