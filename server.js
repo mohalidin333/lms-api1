@@ -36,6 +36,11 @@ app.use(express.static("public/avatars"));
 
 // verify Token Middleware
 const verifyTokenMiddleware = (req, res, next) => {
+  if (req.path === "/logout") {
+    // Skip token verification for logout endpoint
+    return next();
+  }
+
   const token = req.cookies.accessToken;
 
   jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
@@ -358,47 +363,48 @@ app.post("/logout", verifyTokenMiddleware, (req, res) => {
   const userId = req.user.id;
   res.clearCookie("accessToken");
   res.json({msg: "success"});
-  // pool.getConnection((err, db) => {
-  //   if (err) {
-  //     console.error("Error getting database connection: " + err.message);
-  //     return res.status(500).json({ msg: "Internal server error" });
-  //   }
 
-  //   const sql = "SELECT * FROM tb_user WHERE id = ?";
+  pool.getConnection((err, db) => {
+    if (err) {
+      console.error("Error getting database connection: " + err.message);
+      return res.status(500).json({ msg: "Internal server error" });
+    }
 
-  //   db.query(sql, [userId], (err, result) => {
-  //     if (err) {
-  //       db.release(); // Release the connection in case of an error
-  //       return res.json({ error: "select error" });
-  //     }
+    const sql = "SELECT * FROM tb_user WHERE id = ?";
 
-  //     if (result.length > 0) {
-  //       const fname = result[0].fname;
-  //       const middlename = result[0].middlename;
-  //       const lname = result[0].lname;
-  //       const role = result[0].role;
+    db.query(sql, [userId], (err, result) => {
+      if (err) {
+        db.release(); // Release the connection in case of an error
+        return res.json({ error: "select error" });
+      }
 
-  //       const sql1 =
-  //         "INSERT INTO tb_user_log (fname, middlename, lname, role, action, time) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)";
+      if (result.length > 0) {
+        const fname = result[0].fname;
+        const middlename = result[0].middlename;
+        const lname = result[0].lname;
+        const role = result[0].role;
 
-  //       db.query(
-  //         sql1,
-  //         [fname, middlename, lname, role, "Out"],
-  //         (err1, result1) => {
-  //           // Release the connection after the query is executed
-  //           db.release();
+        const sql1 =
+          "INSERT INTO tb_user_log (fname, middlename, lname, role, action, time) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)";
 
-  //           if (err1) return res.json({ msg: "insert error error" });
-  //           return res.json({ msg: "success" });
-  //         }
-  //       );
-  //     } else {
-  //       // Release the connection if no matching user found
-  //       db.release();
-  //       return res.json({ msg: "success" });
-  //     }
-  //   });
-  // });
+        db.query(
+          sql1,
+          [fname, middlename, lname, role, "Out"],
+          (err1, result1) => {
+            // Release the connection after the query is executed
+            db.release();
+
+            if (err1) return res.json({ msg: "insert error error" });
+            return res.json({ msg: "success" });
+          }
+        );
+      } else {
+        // Release the connection if no matching user found
+        db.release();
+        return res.json({ msg: "success" });
+      }
+    });
+  });
 });
 
 // clearLogs
