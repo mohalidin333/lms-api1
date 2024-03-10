@@ -22,7 +22,7 @@ const pool = mysql.createPool({
 
 // cors
 const corsOptions = {
-  origin: "http://localhost:8081",
+  origin: "https://ite-lms.com",
   methods: "GET,PUT,POST,DELETE",
   credentials: true,
   optionsSuccessStatus: 204,
