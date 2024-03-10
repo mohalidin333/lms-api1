@@ -22,7 +22,7 @@ const pool = mysql.createPool({
 
 // cors
 const corsOptions = {
-  origin: "http://localhost:8081/",
+  origin: "http://localhost:8081",
   methods: "GET,PUT,POST,DELETE",
   credentials: true,
   optionsSuccessStatus: 204,
@@ -33,8 +33,6 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static("public/avatars"));
-
-app.set("trust proxy", 1);
 
 // verify Token Middleware
 const verifyTokenMiddleware = (req, res, next) => {
@@ -283,7 +281,7 @@ app.post("/login", (req, res) => {
           expiresIn: "1d",
         });
         res.cookie("accessToken", token, {
-          httpOnly: false,
+          httpOnly: true,
           secure: true,
           sameSite: "none",
         });
@@ -357,9 +355,11 @@ app.get("/userName", verifyTokenMiddleware, (req, res) => {
 
 // logout
 app.post("/logout", (req, res) => {
-  res.clearCookie("accessToken", {domain: "http://localhost:8081/"});
+  res.clearCookie("accessToken", {domain: "http://localhost:8081"});
   res.json({msg: "success"});
+
   const userId = req.user.id;
+  
   pool.getConnection((err, db) => {
     if (err) {
       console.error("Error getting database connection: " + err.message);
