@@ -354,16 +354,10 @@ app.get("/userName", verifyTokenMiddleware, (req, res) => {
 });
 
 // logout
-app.get("/logout", (req, res) => {
-  const token = req.cookies.token;
+app.post("/logout", (req, res) => {
+  res.clearCookie("token", {domain: "http://localhost:8081"});
+  res.json({msg: "success"});
   
-  if (token) {
-    res.clearCookie("token");
-    res.json({msg: "success"});
-  } else {
-    return res.json({msg: `No token found: ${token}`});
-  }
-
   // const userId = req.user.id;
   // pool.getConnection((err, db) => {
   //   if (err) {
