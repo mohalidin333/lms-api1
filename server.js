@@ -354,7 +354,7 @@ app.get("/userName", verifyTokenMiddleware, (req, res) => {
 });
 
 // logout
-app.post("/logout", verifyTokenMiddleware, (req, res) => {
+app.get("/logout", verifyTokenMiddleware, (req, res) => {
   res.clearCookie("accessToken");
   const userId = req.user.id;
 
