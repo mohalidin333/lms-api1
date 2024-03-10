@@ -36,12 +36,7 @@ app.use(express.static("public/avatars"));
 
 // verify Token Middleware
 const verifyTokenMiddleware = (req, res, next) => {
-  if (req.path === "/logout") {
-    // Skip token verification for logout endpoint
-    return next();
-  }
-
-  const token = req.cookies.accessToken;
+  const token = req.cookies.token;
 
   jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
     if (err) {
@@ -285,7 +280,7 @@ app.post("/login", (req, res) => {
         const token = jwt.sign({ id, role }, secretKey, {
           expiresIn: "1d",
         });
-        res.cookie("accessToken", token, {
+        res.cookie("token", token, {
           httpOnly: true,
           secure: true,
           sameSite: "none",
@@ -318,7 +313,7 @@ app.post("/login", (req, res) => {
 
 // user auth
 app.get("/isAuth", (req, res) => {
-  const token = req.cookies.accessToken;
+  const token = req.cookies.token;
 
   if (!token) {
     return res.json({ msg: "no token" });
@@ -359,14 +354,14 @@ app.get("/userName", verifyTokenMiddleware, (req, res) => {
 });
 
 // logout
-app.post("/logout", (req, res) => {
-  const accessToken = req.cookies.accessToken;
+app.get("/logout", (req, res) => {
+  const token = req.cookies.token;
   
-  if (accessToken) {
-    res.clearCookie("accessToken");
+  if (token) {
+    res.clearCookie("token");
     res.json({msg: "success"});
   } else {
-    return res.json({msg: `No token found: ${accessToken}`});
+    return res.json({msg: `No token found: ${token}`});
   }
 
   // const userId = req.user.id;
