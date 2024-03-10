@@ -281,7 +281,7 @@ app.post("/login", (req, res) => {
           expiresIn: "1d",
         });
         res.cookie("token", token, {
-          httpOnly: true,
+          httpOnly: false,
           secure: true,
           sameSite: "none",
         });
@@ -357,7 +357,7 @@ app.get("/userName", verifyTokenMiddleware, (req, res) => {
 app.post("/logout", (req, res) => {
   res.clearCookie("token", {domain: "http://localhost:8081"});
   res.json({msg: "success"});
-  
+
   // const userId = req.user.id;
   // pool.getConnection((err, db) => {
   //   if (err) {
