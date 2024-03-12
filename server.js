@@ -283,7 +283,7 @@ app.post("/login", (req, res) => {
         res.cookie("accessToken", token, {
           httpOnly: true,
           secure: true,
-          sameSite: "none",
+          sameSite: "None",
         });
 
         const sql1 =
@@ -357,7 +357,7 @@ app.get("/userName", verifyTokenMiddleware, (req, res) => {
 app.get("/logout", (req, res) => {
   res.clearCookie("accessToken", { expires: new Date(0) }); // Set expiry to past date
   res.send({ msg: "success" });
-  
+  // const userId = req.user.id;
 
   // pool.getConnection((err, db) => {
   //   if (err) {
