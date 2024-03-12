@@ -1431,7 +1431,7 @@ app.post(
       }
 
       const sql =
-        "INSERT INTO tb_exercise (class_id, user_id, time, points, note, exercise, description, questions, created_at, deadline, file, file_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?)";
+        "INSERT INTO tb_exercise (class_id, user_id, time, points, note, exercise, description, questions, created_at, deadline, file, file_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?)";
 
       if (exercise !== "" && points !== 0 && description !== "") {
         db.query(
