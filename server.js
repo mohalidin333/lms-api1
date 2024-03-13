@@ -8,6 +8,8 @@ const path = require("path");
 require("dotenv").config();
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
+const fs = require("fs");
+const mega = require("mega");
 
 const app = express();
 const port = 3001;
@@ -46,6 +48,8 @@ const verifyTokenMiddleware = (req, res, next) => {
     next();
   });
 };
+
+const client = mega({ email: 'your_email@example.com', password: 'your_password' });
 
 // file upload middleware
 const storage = multer.diskStorage({
@@ -524,30 +528,47 @@ app.get("/userData", verifyTokenMiddleware, (req, res) => {
 
 // updateData
 app.put(
-  "/updateData",
+  '/updateData',
   verifyTokenMiddleware,
-  upload.single("avatar"),
   (req, res) => {
+    const { fname, middlename, lname, gender } = req.body;
+    const userId = req.user.id;
+
+    let avatar;
+
+    if (!req.file) {
+      if (gender === 'Male') {
+        avatar = 'male.png';
+      } else {
+        avatar = 'female.png';
+      }
+    } else {
+      // Upload file to Mega
+      const fileStream = fs.createReadStream(req.file.path);
+      const fileMetadata = {
+        name: req.file.filename,
+        size: req.file.size
+      };
+
+      client.upload({ name: req.file.filename, size: req.file.size, fileStream })
+        .then((file) => {
+          avatar = file.downloadId;
+          // Remove the file from the local filesystem after upload
+          fs.unlinkSync(req.file.path);
+        })
+        .catch((err) => {
+          console.error('Error uploading file to Mega:', err);
+          return res.status(500).json({ error: 'Internal server error' });
+        });
+    }
+
+    const sql = 'UPDATE tb_user SET fname = ?, middlename = ?, lname = ?, gender = ?, avatar = ? WHERE id = ?';
+
     pool.getConnection((err, db) => {
       if (err) {
-        console.error("Error getting database connection: " + err.message);
-        return res.status(500).json({ msg: "Internal server error" });
+        console.error('Error getting database connection: ' + err.message);
+        return res.status(500).json({ msg: 'Internal server error' });
       }
-      const { fname, middlename, lname, gender } = req.body;
-      let avatar;
-
-      if (!req.file) {
-        if (gender === "Male") {
-          avatar = "male.png";
-        } else {
-          avatar = "female.png";
-        }
-      } else {
-        avatar = req.file.filename;
-      }
-      const userId = req.user.id;
-      const sql =
-        "UPDATE tb_user SET fname = ?, middlename = ?, lname = ?, gender = ?, avatar = ? WHERE id = ?";
 
       db.query(
         sql,
@@ -555,8 +576,8 @@ app.put(
         (err, result) => {
           db.release();
 
-          if (err) return res.json({ error: "update error" });
-          return res.json({ msg: "updated" });
+          if (err) return res.status(500).json({ error: 'update error' });
+          return res.json({ msg: 'updated' });
         }
       );
     });
