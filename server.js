@@ -584,6 +584,7 @@ app.put(
   }
 );
 
+
 // getEmail
 app.get("/getEmail", verifyTokenMiddleware, (req, res) => {
   pool.getConnection((err, db) => {
