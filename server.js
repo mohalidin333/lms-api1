@@ -1202,7 +1202,7 @@ app.get("/studentGetAnnouncement/:id", (req, res) => {
 
     const classId = req.params.id;
 
-    const sql = "SELECT * FROM tb_contents WHERE class_id = ?";
+    const sql = "SELECT * FROM tb_contents WHERE class_id = ? ORDER BY id DESC";
     db.query(sql, [classId], (err, result) => {
       db.release();
       if (err) return res.json({ msg: "select error" });
@@ -1552,7 +1552,7 @@ app.get("/studentExercise/:id", verifyTokenMiddleware, (req, res) => {
     const classId = req.params.id;
     const userId = req.user.id;
 
-    const sql = "SELECT * FROM `tb_exercise` WHERE class_id = ?";
+    const sql = "SELECT * FROM `tb_exercise` WHERE class_id = ? ORDER BY id DESC";
     db.query(sql, [classId], (err, result) => {
       if (err) {
         db.release(); // Release the connection in case of an error
@@ -1763,7 +1763,7 @@ app.get("/joinedClass", verifyTokenMiddleware, (req, res) => {
     }
 
     const userId = req.user.id;
-    const sql = "SELECT class_id FROM tb_joinclass WHERE user_id = ?";
+    const sql = "SELECT class_id FROM tb_joinclass WHERE user_id = ? ORDER BY id DESC";
 
     db.query(sql, [userId], (err, result) => {
       if (err) {
