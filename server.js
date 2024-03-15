@@ -869,7 +869,7 @@ app.get("/getClass", verifyTokenMiddleware, (req, res) => {
     }
 
     const userId = req.user.id;
-    const sql = "SELECT * FROM `tb_class` WHERE user_id = ? AND is_archive = ?";
+    const sql = "SELECT * FROM `tb_class` WHERE user_id = ? AND is_archive = ? ORDER BY id DESC";
 
     db.query(sql, [userId, "No"], (err, result) => {
       db.release();
@@ -908,7 +908,7 @@ app.get("/getArchivedClasses", verifyTokenMiddleware, (req, res) => {
     }
 
     const userId = req.user.id;
-    const sql = "SELECT * FROM `tb_class` WHERE user_id = ? AND is_archive = ?";
+    const sql = "SELECT * FROM `tb_class` WHERE user_id = ? AND is_archive = ? ORDER BY id DESC";
 
     db.query(sql, [userId, "Yes"], (err, result) => {
       db.release();
@@ -1182,7 +1182,7 @@ app.get("/getAnnounce/:id", verifyTokenMiddleware, (req, res) => {
     const userId = req.user.id;
     const classId = req.params.id;
 
-    const sql = "SELECT * FROM tb_contents WHERE class_id = ? AND user_id = ?";
+    const sql = "SELECT * FROM tb_contents WHERE class_id = ? AND user_id = ? ORDER BY id DESC";
     db.query(sql, [classId, userId], (err, result) => {
       db.release();
       if (err) return res.json({ msg: "select error" });
@@ -1474,7 +1474,7 @@ app.get("/exercise/:id", verifyTokenMiddleware, (req, res) => {
     const classId = req.params.id;
 
     const sql =
-      "SELECT * FROM `tb_exercise` WHERE class_id = ? AND user_id = ?";
+      "SELECT * FROM `tb_exercise` WHERE class_id = ? AND user_id = ? ORDER BY id DESC";
     db.query(sql, [classId, userId], (err, result) => {
       if (err) {
         db.release();
